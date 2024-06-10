@@ -25,6 +25,7 @@ by Gaz
     $ mkdir .certs
     $ cd .certs
     $ mkcert www.aichat.local
+    $ mkcert aichat.local
     $ mkcert portal.aichat.local
     $ cd ..
     ```
@@ -58,6 +59,7 @@ by Gaz
     ```
    Add in a new line to the bottom of the file such as:
     ```
+   127.0.0.1       aichat.local
    127.0.0.1       www.aichat.local
    127.0.0.1       portal.aichat.local
     ```

@@ -1,0 +1,58 @@
+version: "3.7"
+services:
+  app:
+    build:
+      args:
+        user: gary
+        uid: 1000
+      context: ./
+      dockerfile: Dockerfile
+    image: php:8.2-fpm
+    container_name: aichat-app
+    restart: unless-stopped
+    working_dir: /var/app/current/
+    volumes:
+      - ./:/var/app/current/
+    networks:
+      - aiChatNet
+
+  mysql:
+    image: mysql/mysql-server:8.0
+    container_name: aichat-db
+    restart: always
+    tty: true
+    ports:
+      - "49494:3306"
+    environment:
+      MYSQL_DATABASE: aichat_db
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_PASSWORD: password
+      MYSQL_USER: aichat_user
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    networks:
+      - aiChatNet
+    command: mysqld --sql_mode=""
+    volumes:
+      - ./database/base:/root
+      - ./database/mysql:/var/lib/mysql
+      - ./docker-compose/mysql/conf/:/etc/mysql/conf.d
+      - ./docker-compose/mysql/init/:/docker-entrypoint-initdb.d
+
+  nginx:
+    image: nginx:alpine
+    container_name: aichat-nginx
+    restart: unless-stopped
+    ports:
+      - 8999:80
+      - 48484:443
+    volumes:
+      - ./.certs/:/etc/nginx/ssl
+      - ./:/var/app/current/
+      - ./docker-compose/nginx/:/etc/nginx/conf.d
+    networks:
+      - aiChatNet
+
+networks:
+  aiChatNet:
+    driver: bridge
